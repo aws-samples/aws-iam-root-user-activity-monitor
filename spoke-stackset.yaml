@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  The AWS CloudFormation template (Spoke) for deployment of the
+  Root Activity Detection solution. This template should be used to create a CloudFormation StackSet.
+
+Parameters:
+  HubAccount:
+    Description: 'Account Id for the hub account, eg. 123456789012'
+    Type: String
+    AllowedPattern: '^\d{12}$'
+
+
+Mappings:
+  EventBridge:
+    Bus:
+      Name: HubAccount-EventBus
+Conditions:
+  # Adding an EventBus as a target within an account is not allowed.
+  IsSpokeAccountEqualToHubAccount: !Not [ !Equals [ !Ref HubAccount , !Ref "AWS::AccountId" ] ]
+Resources:
+  
+  EventsRule:
+    Condition: IsSpokeAccountEqualToHubAccount  # Adding a custom EventBus as a target within an account is not allowed.
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Description: Events rule for monitoring root API activity
+      EventPattern:
+        detail-type:
+          - AWS API Call via CloudTrail
+          - AWS Console Sign In via CloudTrail
+        detail:
+          userIdentity:
+            type:
+              - Root
+      Name: RootActivityMonitorRule
+      State: ENABLED
+      Targets:
+        - Arn: !Sub
+            - >-
+              arn:aws:events:${AWS::Region}:${HubAccount}:event-bus/${EventBusName}
+            - EventBusName: !FindInMap
+                - EventBridge
+                - Bus
+                - Name
+          Id: MemberAccountEvent
+          RoleArn: !GetAtt
+            - EventDeliveryRole
+            - Arn
+
+  EventDeliveryRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /      
+      Policies:
+        - PolicyName: EventBusDeliveryRolePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:PutEvents'
+                Resource: !Sub
+                  - >-
+                    arn:aws:events:${AWS::Region}:${HubAccount}:event-bus/${EventBusName}
+                  - EventBusName: !FindInMap
+                      - EventBridge
+                      - Bus
+                      - Name
+
+
+
+
+

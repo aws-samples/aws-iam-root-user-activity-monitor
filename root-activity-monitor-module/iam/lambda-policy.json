@@ -1,0 +1,35 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "LogStreamAccess",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:*:*:*"
+            ]
+        },
+        {
+            "Sid": "SNSPublishAllow",
+            "Effect": "Allow",
+            "Action": [
+                "sns:Publish"
+            ],
+            "Resource": [
+                "arn:aws:sns:*:*:*"
+            ]
+        },
+        {
+            "Sid": "ListAccountAlias",
+            "Action": [
+                "iam:ListAccountAliases"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
+}
