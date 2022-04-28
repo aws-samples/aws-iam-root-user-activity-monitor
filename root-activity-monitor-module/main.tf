@@ -31,6 +31,11 @@ data "archive_file" "RootActivityLambda" {
 }
 
 resource "aws_lambda_function" "RootActivityLambda" {
+  #checkov:skip=CKV_AWS_116:The Lambda function is triggered by an EventBridge pattern-based rule.
+  #checkov:skip=CKV_AWS_117:The Lambda function is part of a serverless implementation.
+  #checkov:skip=CKV_AWS_173:No AWS KMS key provided to encrypt environment variables. Using AWS Lambda owned key.
+  #checkov:skip=CKV_AWS_50:The Lambda function does not require X-Ray tracing and relies on CloudWatch Logs.
+
   filename      = "${path.module}/outputs/RootActivityLambda.zip"
   function_name = "root-activity-monitor"
   role          = aws_iam_role.LambdaRootAPIMonitorRole.arn
@@ -39,6 +44,7 @@ resource "aws_lambda_function" "RootActivityLambda" {
 
   source_code_hash = data.archive_file.RootActivityLambda.output_base64sha256
   runtime = "python3.8"
+  reserved_concurrent_executions = 1
   
   environment {
     variables = {
@@ -95,7 +101,8 @@ resource "aws_cloudwatch_event_target" "root-activity-event-target" {
 // SNS resources
 resource "aws_sns_topic" "root-activity-sns-topic" {
   name = var.SNSTopicName
-  display_name = "Root-Activity-ALERT"
+  display_name = "AWS IAM Root User Activity Monitor"
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_sns_topic_subscription" "root-activity-sns-topic-sub" {
