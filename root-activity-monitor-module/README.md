@@ -35,8 +35,8 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_OrganizationId"></a> [OrganizationId](#input\_OrganizationId) | Add the Organization ID of your AWS environment. | `string` | `"o-8snfo67u2v"` | yes |
-| <a name="input_SNSSubscriptions"></a> [SNSSubscriptions](#input\_SNSSubscriptions) | Add your email here to be able to receive notifications | `string` | `"mostefb+notifi@amazon.fr"` | yes |
+| <a name="input_OrganizationId"></a> [OrganizationId](#input\_OrganizationId) | Add the Organization ID of your AWS environment. | `string` | `"o-id"` | yes |
+| <a name="input_SNSSubscriptions"></a> [SNSSubscriptions](#input\_SNSSubscriptions) | Add your email here to be able to receive notifications | `string` | `"email@example.com"` | yes |
 | <a name="input_SNSTopicName"></a> [SNSTopicName](#input\_SNSTopicName) | Add SNS topic name. | `string` | `"monitor-root-API-calls"` | yes |
 | <a name="input_region"></a> [region](#input\_region) | Add the region code where resources will be deployed. | `string` | `"eu-west-1"` | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Add tags to set on module resources. | `map(string)` | `{}` | yes |
