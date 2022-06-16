@@ -13,3 +13,11 @@ The code in this repository helps you set up the following target architecture.
 ![RootActivityMonitor](RootActivityMonitor.png)
 
 For prerequisites and instructions for using this AWS Prescriptive Guidance pattern, see [Monitor IAM root user activity](https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/monitor-iam-root-user-activity.html).
+
+## Security
+
+See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+
+## License
+
+This implementation is licensed under the MIT-0 License. See the LICENSE file.
