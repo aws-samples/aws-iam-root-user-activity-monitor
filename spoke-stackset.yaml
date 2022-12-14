@@ -13,7 +13,7 @@ Parameters:
 Mappings:
   EventBridge:
     Bus:
-      Name: HubAccount-EventBus
+      Name: hub-root-activity
 Conditions:
   # Adding an EventBus as a target within an account is not allowed.
   IsSpokeAccountEqualToHubAccount: !Not [ !Equals [ !Ref HubAccount , !Ref "AWS::AccountId" ] ]
