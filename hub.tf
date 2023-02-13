@@ -1,13 +1,12 @@
 module "root-activity-monitor-euw1" {
-    providers = {
-      aws = aws.euw1
-     }
+  providers = {
+    aws = aws.euw1
+  }
   source = "./root-activity-monitor-module"
 
-  //Add the Organization ID of your AWS environment.
-  OrganizationId = "__REPLACE_ORG_ID__"
+
   // Add SNS topic name.
-  SNSTopicName = "monitor-root-API-calls"
+  SNSTopicName = "monitor-root-user-api-calls"
   // Add your email here to be able to receive notifications
   SNSSubscriptions = "__REPLACE_EMAIL_ADDRESS__"
   // Add the region code where resources will be deployed.

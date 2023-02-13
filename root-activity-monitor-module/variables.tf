@@ -7,24 +7,18 @@ variable "tags" {
 variable "region" {
   description = "Add the region code where resources will be deployed."
   type        = string
-  default = "eu-west-1"
-}
-
-variable "OrganizationId" {
-  description = "Add the Organization ID of your AWS environment."
-  type        = string
-  default = "__REPLACE_ORG_ID__"
+  default     = "eu-west-1"
 }
 
 variable "SNSTopicName" {
   description = "Add SNS topic name."
   type        = string
-  default = "aws-iam-root-user-activity-monitor"
+  default     = "aws-iam-root-user-activity-monitor"
 }
 
 variable "SNSSubscriptions" {
   description = "Add your email here to be able to receive notifications"
   type        = string
-  default = "__REPLACE_EMAIL_ADDRESS__"
+  default     = "__REPLACE_EMAIL_ADDRESS__"
 }
 

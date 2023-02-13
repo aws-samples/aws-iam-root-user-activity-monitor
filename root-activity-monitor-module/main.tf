@@ -1,25 +1,25 @@
 // Lambda function resources
 
 resource "aws_iam_role_policy" "LambdaRootAPIMonitorPolicy" {
-  name = "LambdaRootAPIMonitorPolicy"
-  role = aws_iam_role.LambdaRootAPIMonitorRole.id
+  name   = "LambdaRootAPIMonitorPolicy"
+  role   = aws_iam_role.LambdaRootAPIMonitorRole.id
   policy = file("${path.module}/iam/lambda-policy.json")
 }
 
 resource "aws_iam_role" "LambdaRootAPIMonitorRole" {
-  name = "LambdaRootAPIMonitorRole"
+  name               = "LambdaRootAPIMonitorRole"
   assume_role_policy = file("${path.module}/iam/lambda-assume-policy.json")
-  tags = var.tags
+  tags               = var.tags
 }
 
 resource "aws_lambda_permission" "allow_events" {
   statement_id  = "AllowExecutionFromEvents"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.RootActivityLambda.function_name
-  principal     = "events.amazonaws.com"  
-  source_arn    = aws_cloudwatch_event_rule.hub-root-activity-rule.arn  
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.hub-root-activity-rule.arn
   depends_on = [
-    
+
     aws_lambda_function.RootActivityLambda
   ]
 }
@@ -42,15 +42,15 @@ resource "aws_lambda_function" "RootActivityLambda" {
   handler       = "RootActivityLambda.lambda_handler"
   timeout       = "15"
 
-  source_code_hash = data.archive_file.RootActivityLambda.output_base64sha256
-  runtime = "python3.8"
+  source_code_hash               = data.archive_file.RootActivityLambda.output_base64sha256
+  runtime                        = "python3.8"
   reserved_concurrent_executions = 1
-  
+
   environment {
     variables = {
       SNSARN = aws_sns_topic.root-activity-sns-topic.arn
     }
-  }  
+  }
 }
 
 // Event Bus Resources
@@ -60,19 +60,19 @@ resource "aws_cloudwatch_event_bus" "hub-root-activity-eventbus" {
 
 resource "aws_cloudwatch_event_permission" "hub-root-activity-eventbus-OrgAccess" {
   event_bus_name = aws_cloudwatch_event_bus.hub-root-activity-eventbus.name
-  principal    = "*"
-  statement_id = "OrganizationAccess"
+  principal      = "*"
+  statement_id   = "OrganizationAccess"
 
   condition {
     key   = "aws:PrincipalOrgID"
     type  = "StringEquals"
-    value = var.OrganizationId
+    value = data.aws_organizations_organization.myorg.id
   }
 }
 
 resource "aws_cloudwatch_event_rule" "hub-root-activity-rule" {
-  name        = "hub-capture-root-activity"
-  description = "Capture root user AWS Console Sign In and AWS API calls."
+  name           = "hub-capture-root-activity"
+  description    = "Capture root user AWS Console Sign In and AWS API calls."
   event_bus_name = aws_cloudwatch_event_bus.hub-root-activity-eventbus.name
 
   event_pattern = <<EOF
@@ -94,19 +94,19 @@ EOF
 
 resource "aws_cloudwatch_event_target" "root-activity-event-target" {
   event_bus_name = aws_cloudwatch_event_bus.hub-root-activity-eventbus.name
-  rule      = aws_cloudwatch_event_rule.hub-root-activity-rule.name
-  arn       = aws_lambda_function.RootActivityLambda.arn
+  rule           = aws_cloudwatch_event_rule.hub-root-activity-rule.name
+  arn            = aws_lambda_function.RootActivityLambda.arn
 }
 
 // SNS resources
 resource "aws_sns_topic" "root-activity-sns-topic" {
-  name = var.SNSTopicName
-  display_name = "AWS IAM Root User Activity Monitor"
+  name              = var.SNSTopicName
+  display_name      = "AWS IAM Root User Activity Monitor"
   kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_sns_topic_subscription" "root-activity-sns-topic-sub" {
-  endpoint = var.SNSSubscriptions
-  protocol = "email-json"
+  endpoint  = var.SNSSubscriptions
+  protocol  = "email-json"
   topic_arn = aws_sns_topic.root-activity-sns-topic.arn
 }
